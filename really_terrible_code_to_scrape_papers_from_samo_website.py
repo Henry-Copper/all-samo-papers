@@ -33,7 +33,7 @@ async def curl_pdfs(questions_solutions=None, round=None, year=None, junior_seni
 
 
     grade = f" Grade {grade}" if grade != '' else ''
-    with open(f"{dir_path}/{junior_senior} Paper Round {round} {questions_solutions} {grade}{year}.pdf", "wb") as pdf:
+    with open(f"{dir_path}/{junior_senior} Paper Round {round} {questions_solutions}{grade} {year}.pdf", "wb") as pdf:
         pdf.write(content)
 
 tasks = []
