@@ -1,6 +1,6 @@
 import aiohttp, asyncio, os
 
-whitelisted_pdfs = ['https://www.samf.ac.za/content/files/QuestionPapers/j2q2015.pdf',
+whitelisted_pdfs = ['https://www.samf.ac.za/content/files/QuestionPapers/j2q2015.pdf', # b was added to the end of these filenames because why not?
                     'https://www.samf.ac.za/content/files/QuestionPapers/j2s2015.pdf',
                     'https://www.samf.ac.za/content/files/QuestionPapers/s2s2020.pdf',
                     'https://www.samf.ac.za/content/files/QuestionPapers/j3s2020.pdf', # missing due to COVID
@@ -37,13 +37,15 @@ async def curl_pdfs(questions_solutions=None, round=None, year=None, junior_seni
         pdf.write(content)
 
 tasks = []
-# senior papers and memos
+
 async def do_loop():
     for questions_solutions in ["q", "s"]:
+
+        # a whole bunch of different combinations are used because the format of the test has changed over time
         for round in range(1, 4):
             for year in range(1997, 2023):
                 tasks.append(curl_pdfs(questions_solutions, round, year, 's'))
-            for year in range(2004, 2011): # junior papers start at 2004
+            for year in range(2004, 2011):
                 tasks.append(curl_pdfs(questions_solutions, round, year, 'j'))
         for round in range(2, 4):
             for year in range(2011, 2023):
@@ -55,10 +57,12 @@ async def do_loop():
             for year in range(2011, 2023):
                 for grade in [8, 9]:
                     tasks.append(curl_pdfs(questions_solutions, round, year, 'j', grade))
-    tasks.append(curl_pdfs('q', 2, 2015, 'j', manual_request="https://www.samf.ac.za/content/files/QuestionPapers/j2q2015b.pdf")) # special files
+    tasks.append(curl_pdfs('q', 2, 2015, 'j', manual_request="https://www.samf.ac.za/content/files/QuestionPapers/j2q2015b.pdf")) # special files with b???
     tasks.append(curl_pdfs('s', 2, 2015, 'j', manual_request="https://www.samf.ac.za/content/files/QuestionPapers/j2s2015b.pdf"))
     tasks.append(curl_pdfs('s', 2, 2020, 's', manual_request="https://www.samf.ac.za/content/files/QuestionPapers/s2s2020b.pdf"))
 
     await asyncio.gather(*tasks)
 
 asyncio.run(do_loop())
+
+# suggestion to the SAMF: don't let a single IP address sent so many requests in a short space of time; the fact that I'm able to do this scraping asynchronously is worrying
